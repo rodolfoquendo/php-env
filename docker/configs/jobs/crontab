@@ -1,0 +1,36 @@
+
+MAIL_TO=rodolfoquendo@gmail.com
+
+* * * * * /bin/bash /scripts/cron.sh minute 1
+
+0,5,10,15,20,25,30,35,40,45,50,55 * * * * /bin/bash ./scripts/cron.sh minute 5
+
+2,17,32,47 * * * * /bin/bash ./scripts/cron.sh minute 15
+
+3,33 * * * * /bin/bash ./scripts/cron.sh minute 30
+
+9 * * * * /bin/bash /scripts/cron.sh hour 1
+
+11 1,4,7,10,13,16,19,22 * * * /bin/bash ./scripts/cron.sh hour 3
+
+12 0,6,12,18 * * * /bin/bash ./scripts/cron.sh hour 6
+
+17 2,14 * * * /bin/bash ./scripts/cron.sh hour 12
+
+22 3 * * * /bin/bash ./scripts/cron.sh day 1
+
+27 4 * * 0 /bin/bash ./scripts/cron.sh day 7
+
+42 5 15,30 * * /bin/bash ./scripts/cron.sh day 15
+
+27 5 1 * * /bin/bash ./scripts/cron.sh month 1
+
+19 5 1 1,4,7,10 * /bin/bash ./scripts/cron.sh month 3
+
+43 5 1 1,7 * ./scripts/cron.sh month 6
+
+36 1 1 1 * ./scripts/cron.sh year 1
+
+#LEAVE A MOTHERFUCKER LINE EMPTY AT THE END IT WONT WORK IF YOU DONT MOTHERFUCKER
+
+

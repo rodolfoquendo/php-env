@@ -1,0 +1,20 @@
+#!/bin/sh
+echo "Welcome, $(whoami) @ $(date)
+
+Configuration:
+
+- /usr/local/etc/php/php.ini
+- /usr/local/etc/php-fpm.conf
+- /usr/local/etc/php-fpm.d/www.conf
+- /usr/local/etc/php-fpm.d/zz-fpm.conf
+
+Extensions:
+
+- /usr/local/etc/php/conf.d/*
+
+Processes running:
+
+$(ps aux|grep php)
+
+Edit this message in ${0}
+"

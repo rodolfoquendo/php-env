@@ -1,0 +1,83 @@
+version: "3"
+
+services:
+  jobs:
+    image: jobs
+    build: 
+      context: .
+      dockerfile: ../dockerfiles/Dockerfile.jobs
+    container_name: jobs
+    networks:
+      - my_net
+    expose:
+      - 80
+      - 443
+    restart: always
+    volumes:
+      - ../../volumes/logs/crons:/crons
+      - ../configs/jobs/scripts/dev:/scripts
+      - ../configs/jobs/start.sh:/start.sh
+      - ../configs/jobs/crontab:/etc/crontab 
+  db:
+    image: db
+    build: 
+      context: .
+      dockerfile: ../dockerfiles/Dockerfile.mysql
+    container_name: db
+    depends_on:
+      - jobs
+    networks:
+      - my_net
+    expose:
+      - 3306
+    ports: 
+      - "3306:3306"
+    restart: always
+    volumes:
+      - ../../volumes/db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=87654321
+      - MYSQL_DATABASE=my_db
+      - MYSQL_USER=dev
+      - MYSQL_PASSWORD=12345678
+  proxy:
+    image: nginx:alpine
+    build: 
+      context: .
+      dockerfile: ../dockerfiles/Dockerfile.proxy
+    container_name: nginx
+    networks:
+      - my_net
+    expose: 
+      - 80
+      - 443
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../configs/nginx-proxy/local:/etc/nginx/conf.d
+      - ../../src:/src
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+  php:
+    image: custom_php:latest
+    build: 
+      context: .
+      dockerfile: ../dockerfiles/Dockerfile.php-fpm
+    container_name: php
+    networks:
+      - my_net
+    volumes:
+      - ../../src:/src
+      - ../configs/php/php.ini:/usr/local/etc/php/php.ini
+      - ../configs/php/browscap.ini:/etc/defaults/php/browscap.ini
+      - ../configs/php/php-fpm.conf:/etc/defaults/php/fpm.conf
+      - ../configs/php/php-fpm.conf:/usr/local/etc/php-fpm.d/zz-fpm.conf
+      - ../configs/php/greet:/etc/greet
+      - ../../volumes/logs:/var/log
+      - ../../volumes/files:/src/school/files
+    restart: always
+    environment:
+      - APP_NAME=practice
+networks:
+  my_net:
+    external: true

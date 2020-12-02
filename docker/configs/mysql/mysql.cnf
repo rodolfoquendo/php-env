@@ -1,0 +1,5 @@
+[mysqld]
+bind_address=0.0.0.0
+innodb_buffer_pool_size = 512M
+innodb_data_file_path=/var/lib/mysql/ibdata1:768M:autoextend
+explicit_defaults_for_timestamp = 1

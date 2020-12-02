@@ -1,0 +1,64 @@
+FROM php:7.4-fpm
+MAINTAINER Rodolfo Oquendo <rodolfoquendo@gmail.com>
+WORKDIR /src
+ENV TZ=America/Argentina/Buenos_Aires
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN pecl channel-update pecl.php.net
+RUN apt-get update -y 
+RUN apt-get -y install \
+        ffmpeg libavcodec-dev libavdevice-dev libavfilter-dev libavformat-dev libavresample-dev libavutil-dev libpostproc-dev libswresample-dev libswscale-dev \
+        file \
+        git \
+        libbz2-dev \
+        libcurl4-gnutls-dev \
+        libexif-dev \
+        libfreetype6-dev \
+        libgd-dev libgmp-dev libjpeg-dev libjpeg62-turbo-dev libmagic-dev libmagickwand-dev libpng-dev libpng++-dev \
+        libmcrypt-dev \
+        libmhash-dev \
+        libssh2-1-dev \
+        libssl-dev \
+        libtidy-dev \
+        libvpx-dev \
+        libxml2-dev \
+        libyaml-dev \
+        libzip-dev \
+        openssl \
+        re2c \
+        unzip \
+        zip \ 
+        zlib1g-dev
+RUN pecl install \
+        yaml \
+        zip \
+        xdebug \
+        imagick 
+RUN docker-php-ext-install \
+        bcmath \
+        bz2 \
+        calendar \
+	curl \
+        exif \
+        gd \
+        gmp \
+        mysqli \
+        pcntl \
+        pdo \
+        pdo_mysql \
+        phar \
+        posix \
+        simplexml \
+        sockets \
+        zip \
+        dom
+RUN docker-php-ext-enable \
+        mysqli \
+        gd \
+        imagick 
+# RUN docker-php-ext-configure gd --with-jpeg-dir=shared --with-png-dir=shared
+# RUN a2enmod rewrite && a2enmod headers
+RUN php -r "readfile('https://getcomposer.org/installer');" | php -- --filename=composer --install-dir=/usr/local/bin 
+EXPOSE 9000
+RUN apt-get install -y procps
+RUN echo "sh /etc/greet" >> /root/.bashrc
+ENTRYPOINT php-fpm

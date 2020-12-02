@@ -1,0 +1,7 @@
+FROM mysql:5.7.28  
+EXPOSE 3306
+ENV default_authentication_plugin=mysql_native_password  
+ENV TZ=America/Argentina/Buenos_Aires
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone 
+RUN chmod -R 777 /var/lib/mysql/
+CMD ["mysqld"] 

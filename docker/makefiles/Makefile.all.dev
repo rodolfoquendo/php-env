@@ -1,0 +1,68 @@
+SHELL=/bin/bash
+DD ?= cd docker/docker-compose
+
+PROJECT_0= insignia-main
+DC_0 ?= dc.dev.main.osx.yml
+PROJECT_1= insignia-comms
+DC_1 ?= dc.dev.comms.osx.yml
+PROJECT_2= insignia-files
+DC_2 ?= dc.dev.files.osx.yml
+PROJECT_3= insignia-school
+DC_3 ?= dc.dev.school.osx.yml
+
+COLOR_RESET=\033[0m
+COLOR_TITLE=\033[01;34m     ## bold blue
+COLOR_SUBTITLE=\033[01;36m  ## bold cyan
+COLOR_NORMAL=\033[0m        ## regular reset
+COLOR_DETAIL_1=\033[00;34m  ## regular blue
+COLOR_DETAIL_2=\033[00;36m  ## regular cyan
+COLOR_DETAIL_3=\033[00;35m  ## regular purple
+COLOR_DETAIL_4=\033[00;32m  ## regular green
+
+up: ## Runs containers, updates the database and runs composer install
+	@$(DD) && \
+	docker-compose -f $(DC_1) -p $(PROJECT_1) up -d && \
+	docker-compose -f $(DC_2) -p $(PROJECT_2) up -d && \
+	docker-compose -f $(DC_3) -p $(PROJECT_3) up -d && \
+	docker-compose -f $(DC_0) -p $(PROJECT_0) up -d
+
+ps: ## Checks the status
+	@$(DD)  && \
+	docker-compose -f $(DC_1) -p $(PROJECT_1) ps && \
+	docker-compose -f $(DC_2) -p $(PROJECT_2) ps && \
+	docker-compose -f $(DC_3) -p $(PROJECT_3) ps && \
+	docker-compose -f $(DC_0) -p $(PROJECT_0) ps
+build: ## Builds the images
+	@$(DD)  && PWD &&  \
+	docker-compose -f $(DC_1) -p $(PROJECT_1) up -d --build --force-recreate && \
+	docker-compose -f $(DC_2) -p $(PROJECT_2) up -d --build --force-recreate && \
+	docker-compose -f $(DC_3) -p $(PROJECT_3) up -d --build --force-recreate && \
+	docker-compose -f $(DC_0) -p $(PROJECT_0) up -d --build --force-recreate
+recreate: ## Builds the images
+	@$(DD)  && \
+	docker-compose -f $(DC_1) -p $(PROJECT_1) up -d --force-recreate && \
+	docker-compose -f $(DC_2) -p $(PROJECT_2) up -d --force-recreate && \
+	docker-compose -f $(DC_3) -p $(PROJECT_3) up -d --force-recreate && \
+	docker-compose -f $(DC_0) -p $(PROJECT_0) up -d --force-recreate
+stop: ## Stops the containers
+	@$(DD)  && \
+	docker-compose -f $(DC_1) -p $(PROJECT_1) stop && \
+	docker-compose -f $(DC_2) -p $(PROJECT_2) stop && \
+	docker-compose -f $(DC_3) -p $(PROJECT_3) stop && \
+	docker-compose -f $(DC_0) -p $(PROJECT_0) stop
+down: ## Stops the containers
+	@$(DD)  && \
+	docker-compose -f $(DC_1) -p $(PROJECT_1) down && \
+	docker-compose -f $(DC_2) -p $(PROJECT_2) down && \
+	docker-compose -f $(DC_3) -p $(PROJECT_3) down && \
+	docker-compose -f $(DC_0) -p $(PROJECT_0) down
+clean:
+	@$(DD)  && \
+	docker-compose -f $(DC_1) -p $(PROJECT_1) down && \
+	docker-compose -f $(DC_2) -p $(PROJECT_2) down && \
+	docker-compose -f $(DC_3) -p $(PROJECT_3) down && \
+	docker-compose -f $(DC_0) -p $(PROJECT_0) down && \
+	docker-compose -f $(DC_1) -p $(PROJECT_1) up -d && \
+	docker-compose -f $(DC_2) -p $(PROJECT_2) up -d && \
+	docker-compose -f $(DC_3) -p $(PROJECT_3) up -d && \
+	docker-compose -f $(DC_0) -p $(PROJECT_0) up -d
