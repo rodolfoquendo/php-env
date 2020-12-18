@@ -40,24 +40,56 @@ services:
       - MYSQL_DATABASE=my_db
       - MYSQL_USER=dev
       - MYSQL_PASSWORD=12345678
+  flyway:
+    image: flyway/flyway
+    container_name: flyway
+    depends_on:
+      - db
+    networks:
+      - insignia
+    volumes:
+      - ../../sql:/flyway/sql 
+      - ../configs/flyway:/flyway/conf 
+    command: -url=jdbc:mysql://db:3306/my_db -user=dev -password=12345678 migrate
   proxy:
     image: nginx:alpine
-    build: 
-      context: .
-      dockerfile: ../dockerfiles/Dockerfile.proxy
-    container_name: nginx
+    container_name: proxy
     networks:
       - my_net
     expose: 
       - 80
       - 443
     ports:
-      - "80:80"
+      - "8080:8080"
       - "443:443"
     volumes:
-      - ../configs/nginx-proxy/local:/etc/nginx/conf.d
+      - ../configs/nginx-proxy/prod:/etc/nginx/conf.d
       - ../../src:/src
+      - ../configs/certbot/prod/conf:/etc/letsencrypt
+      - ../configs/certbot/prod/www:/var/www/certbot
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    restart: unless-stopped
+    networks:
+      - insignia
+    volumes:
+      - ../configs/certbot/prod/conf:/etc/letsencrypt
+      - ../configs/certbot/prod/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+  varnish:
+    image: varnish
+    container_name: cache
+    networks:
+      - my_net
+    ports:
+      - "80:80"
+      - "6082:6082"
+    depends_on:
+      - proxy
+    volumes:
+      - ../configs/varnish/default.vcl:/etc/varnish/default.vcl
   php:
     image: custom_php:latest
     build: 

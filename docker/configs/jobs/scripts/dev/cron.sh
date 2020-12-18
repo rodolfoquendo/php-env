@@ -47,11 +47,9 @@ else
     echo "${text}." >> $log_main
 fi
 
-services=(insignia_php_files insignia_php_school insignia_php_mail insignia_php_push )
+services=(php)
 for service in "${services[@]}"; do
-    
-    folder_service=$(echo $service | cut -d'_' -f 3)
-    log_file="/crons/$folder_service/${periodicity}"
+    log_file="/crons/$service/${periodicity}"
     mkdir -p log_file
     log_file="${log_file}/${value}.log"
     touch log_file
